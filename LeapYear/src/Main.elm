@@ -1,10 +1,10 @@
 module Main exposing (..)
 
 import Browser
+import Model exposing (Model, initModel)
 import Msg exposing (Msg)
-import Model exposing (initModel, Model)
-import View exposing (view)
 import Update exposing (update)
+import View exposing (view)
 
 
 main : Program () Model Msg

@@ -1,9 +1,8 @@
 module Update exposing (update)
 
+import Entities exposing (Task)
 import Model exposing (..)
 import Msg exposing (..)
-import Entities exposing (Task)
-
 
 
 update : Msg -> Model -> Model

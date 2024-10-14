@@ -1,4 +1,5 @@
 module Model exposing (..)
+
 import Entities exposing (Task)
 
 

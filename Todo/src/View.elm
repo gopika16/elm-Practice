@@ -1,11 +1,11 @@
 module View exposing (view)
 
+import Entities exposing (Task)
 import Html exposing (Html, button, div, h1, input, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (checked, style, type_, value)
 import Html.Events exposing (onClick, onInput, onMouseLeave)
 import Model exposing (Model)
 import Msg exposing (Msg(..))
-import Entities exposing (Task)
 
 
 view : Model -> Html Msg

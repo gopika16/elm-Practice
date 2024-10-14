@@ -1,5 +1,5 @@
 module Update exposing (..)
-import Msg exposing (Msg)
+
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 
@@ -57,12 +57,4 @@ getLeapYear firstValue secondValue list =
 
 isLeapYear : Int -> Bool
 isLeapYear value =
-    (rem value 4 == 0 && rem value 100 /= 0) || (rem value 400 == 0)
-
-
-rem : Int -> Int -> Int
-rem arg1 arg2 =
-    if arg1 < arg2 then
-        arg1
-    else
-        rem (arg1 - arg2) arg2
+    (modBy 4 value == 0 && modBy 100 value /= 0) || (modBy 400 value == 0)

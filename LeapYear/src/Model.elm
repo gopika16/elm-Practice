@@ -1,11 +1,11 @@
 module Model exposing (..)
 
+
 type alias Model =
     { firstValue : Int
     , secondValue : Int
     , leapYears : List Int
     }
-
 
 
 initModel : Model
