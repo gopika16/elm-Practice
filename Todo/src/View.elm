@@ -1,71 +1,92 @@
 module View exposing (view)
 
-import Html exposing (Html, div, h1, input, button, table, thead, tr, th, tbody, td, text)
-import Html.Attributes exposing (style, type_, value, checked)
-import Html.Events exposing (onClick, onInput)
-import Model exposing (Model, Task)
+import Html exposing (Html, button, div, h1, input, table, tbody, td, text, th, thead, tr)
+import Html.Attributes exposing (checked, style, type_, value)
+import Html.Events exposing (onClick, onInput, onMouseLeave)
+import Model exposing (Model)
 import Msg exposing (Msg(..))
-
+import Entities exposing (Task)
 
 
 view : Model -> Html Msg
 view model =
     div
-        []
+        [ style "margin" "50%"
+        , style "margin-top" "10%"
+        , onMouseLeave ResetId
+        ]
         [ h1 [] [ text "Todo Tasks" ]
         , input
             [ onInput NewTask
+            , style "width" "150px"
             , value (Maybe.withDefault "" model.newTask)
             ]
             []
         , button
-            [ onClick AddTask ]
-            [ text "Add Task" ]
-        , taskTable model
-        ]
-
-taskTable : Model -> Html Msg
-taskTable model =
-    table []
-        [ thead []
-            [ tr []
-                [ th [] [ text "Status" ]
-                , th [] [ text "Description" ]
-                , th [] [ text "Edit" ]
-                , th [] [ text "Delete" ]
-                ]
+            [ onClick AddTask
+            , style "font-size" "20px"
+            , style "padding" "10px"
+            , style "width" "150px"
             ]
-        , tbody [] (List.map (taskRow model) model.allTasks)
+            [ text "Add Task" ]
+        , table
+            [ style "letter-spacing" "1px"
+            , style "border" "2px solid black"
+            , style "width" "19%"
+            , style "margin-top" "15%"
+            ]
+            [ thead []
+                [ tr []
+                    [ th [] [ text "Status" ]
+                    , th [] [ text "Description" ]
+                    , th [] [ text "Delete" ]
+                    ]
+                ]
+            , tbody []
+                (List.map (getTableRow model.editingTaskId) model.allTasks)
+            ]
         ]
 
-taskRow : Model -> Task -> Html Msg
-taskRow model task =
-    tr []
-        [ td []
+
+getTableRow : Maybe Int -> Task -> Html Msg
+getTableRow editingTaskId data =
+    tr
+        []
+        [ td [ style "padding" "5px" ]
             [ input
                 [ type_ "checkbox"
-                , checked task.isComplete
-                , onClick (ToggleTask task.id)
+                , checked data.isComplete
+                , onClick (ToggleTask data.id)
                 ]
                 []
             ]
-        , td []
-            [ if task.isEditing then
+        , td
+            [ style "padding" "5px"
+            , style "text-decoration"
+                (if data.isComplete then
+                    "line-through"
+
+                 else
+                    "none"
+                )
+            , onClick (EditTask data.id)
+            ]
+            [ if Just data.id == editingTaskId then
                 input
-                    [ value task.description
-                    , onInput (UpdateTaskDescription task.id)
+                    [ type_ "text"
+                    , value data.description
+                    , onInput SaveEditedTask
                     ]
                     []
+
               else
-                text task.description
+                text data.description
             ]
-        , td []
-            [ if task.isEditing then
-                button [ onClick (SaveTaskEdit task.id) ] [ text "Save" ]
-              else
-                button [ onClick (EditTask task.id) ] [ text "Edit" ]
-            ]
-        , td []
-            [ button [ onClick (DeleteTask task.id) ] [ text "Delete" ]
+        , td [ style "padding" "5px" ]
+            [ button
+                [ onClick (DeleteTask data.id)
+                , style "background-color" "red"
+                ]
+                [ text "Delete" ]
             ]
         ]

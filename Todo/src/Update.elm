@@ -2,6 +2,8 @@ module Update exposing (update)
 
 import Model exposing (..)
 import Msg exposing (..)
+import Entities exposing (Task)
+
 
 
 update : Msg -> Model -> Model
@@ -9,30 +11,38 @@ update msg model =
     case msg of
         AddTask ->
             case model.newTask of
-                Just newTaskDescription ->
+                Just aTask ->
                     let
                         newTask =
-                            { id = List.length model.allTasks + 1
+                            { id = model.lastId + 1
                             , isComplete = False
-                            , description = newTaskDescription
-                            , isEditing = False
+                            , description = aTask
                             }
                     in
                     { model
                         | allTasks = newTask :: model.allTasks
                         , newTask = Nothing
+                        , lastId = model.lastId + 1
                     }
 
                 Nothing ->
                     model
 
-        NewTask newTaskDescription ->
-            { model | newTask = Just newTaskDescription }
+        NewTask newTask ->
+            if String.trim newTask == "" then
+                { model
+                    | newTask = Nothing
+                }
+
+            else
+                { model
+                    | newTask = Just newTask
+                }
 
         ToggleTask id ->
             let
                 updatedTasks =
-                    List.map (toggleComplete id) model.allTasks
+                    List.map (updateTaskStatus id) model.allTasks
             in
             { model | allTasks = updatedTasks }
 
@@ -40,46 +50,43 @@ update msg model =
             { model | allTasks = List.filter (\task -> task.id /= id) model.allTasks }
 
         EditTask id ->
-            let
-                updatedTasks =
-                    List.map (startEdit id) model.allTasks
-            in
-            { model | allTasks = updatedTasks }
+            { model | editingTaskId = Just id }
 
-        UpdateTaskDescription id newDescription ->
+        SaveEditedTask newDescription ->
+            case model.editingTaskId of
+                Just id ->
+                    let
+                        updatedTasks =
+                            List.map (updateTaskDescription id newDescription) model.allTasks
+                    in
+                    { model | allTasks = updatedTasks }
+
+                Nothing ->
+                    model
+
+        ResetId ->
             { model
-                | editTaskDescription = Just newDescription
+                | editingTaskId = Nothing
             }
 
-        SaveTaskEdit id ->
-            let
-                updatedTasks =
-                    List.map (saveEdit id model.editTaskDescription) model.allTasks
-            in
-            { model | allTasks = updatedTasks, editTaskDescription = Nothing }
 
-toggleComplete : Int -> Task -> Task
-toggleComplete id task =
+updateTaskDescription : Int -> String -> Task -> Task
+updateTaskDescription id newDescription task =
     if task.id == id then
-        { task | isComplete = not task.isComplete }
+        { task | description = newDescription }
+
     else
         task
 
-startEdit : Int -> Task -> Task
-startEdit id task =
+
+updateTaskStatus : Int -> Task -> Task
+updateTaskStatus id task =
     if task.id == id then
-        { task | isEditing = True }
+        let
+            updatedTask =
+                { task | isComplete = not task.isComplete }
+        in
+        updatedTask
+
     else
         task
-
-saveEdit : Int -> Maybe String -> Task -> Task
-saveEdit id maybeNewDescription task =
-    case maybeNewDescription of
-        Just newDescription ->
-            if task.id == id then
-                { task | description = newDescription, isEditing = False }
-            else
-                task
-
-        Nothing ->
-            task

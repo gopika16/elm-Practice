@@ -3,7 +3,7 @@ module Main exposing (..)
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (checked, style, type_, value)
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick, onInput, onMouseLeave)
 
 
 main : Program () Model Msg
@@ -33,6 +33,7 @@ initialModel =
         ]
     , newTask = Nothing
     , editingTaskId = Nothing
+    , lastId = 3
     }
 
 
@@ -40,6 +41,7 @@ type alias Model =
     { allTasks : List Task
     , newTask : Maybe String
     , editingTaskId : Maybe Int
+    , lastId : Int
     }
 
 
@@ -57,6 +59,7 @@ type Msg
     | DeleteTask Int
     | EditTask Int
     | SaveEditedTask String
+    | ResetId
 
 
 view : Model -> Html Msg
@@ -64,6 +67,7 @@ view model =
     div
         [ style "margin" "50%"
         , style "margin-top" "10%"
+        , onMouseLeave ResetId
         ]
         [ h1 [] [ text "Todo Tasks" ]
         , input
@@ -89,7 +93,6 @@ view model =
                 [ tr []
                     [ th [] [ text "Status" ]
                     , th [] [ text "Description" ]
-                    , th [] [ text "Edit" ]
                     , th [] [ text "Delete" ]
                     ]
                 ]
@@ -120,36 +123,26 @@ getTableRow editingTaskId data =
                  else
                     "none"
                 )
+            , onClick (EditTask data.id)
             ]
-            [  text data.description
-            ]
-        , td [ style "padding" "5px" ]
-            [ input
-                [ type_ "button"
-                , onClick (EditTask data.id)
-                , style "background-color" "yellow"
-                ]
-                []
-            ]
-        , td [ style "padding" "5px" ]
-            [ input
-                [ type_ "button"
-                , onClick (DeleteTask data.id)
-                , style "background-color" "red"
-                ]
-                []
-            ]
-        , td [ style "padding" "5px" ]
             [ if Just data.id == editingTaskId then
-                input 
+                input
                     [ type_ "text"
                     , value data.description
-                    , onInput SaveEditedTask -- Handle input changes to save edited task
+                    , onInput SaveEditedTask
                     ]
                     []
+
               else
                 text data.description
-            ] 
+            ]
+        , td [ style "padding" "5px" ]
+            [ button
+                [ onClick (DeleteTask data.id)
+                , style "background-color" "red"
+                ]
+                [ text "Delete" ]
+            ]
         ]
 
 
@@ -161,7 +154,7 @@ update msg model =
                 Just aTask ->
                     let
                         newTask =
-                            { id = List.length model.allTasks + 1
+                            { id = model.lastId + 1
                             , isComplete = False
                             , description = aTask
                             }
@@ -169,6 +162,7 @@ update msg model =
                     { model
                         | allTasks = newTask :: model.allTasks
                         , newTask = Nothing
+                        , lastId = model.lastId + 1
                     }
 
                 Nothing ->
@@ -195,41 +189,31 @@ update msg model =
         DeleteTask id ->
             { model | allTasks = List.filter (\task -> task.id /= id) model.allTasks }
 
-        
         EditTask id ->
-            { model | editingTaskId = Just id } -- Set the ID of the task being edited
+            { model | editingTaskId = Just id }
 
         SaveEditedTask newDescription ->
-            case model.editingTaskId of 
+            case model.editingTaskId of
                 Just id ->
-                    let updatedTasks =
-                            List.map (updateEditedDescription id newDescription) model.allTasks 
-                    in 
-                    { model | allTasks = updatedTasks, editingTaskId = Nothing } -- Reset editing state
-                
+                    let
+                        updatedTasks =
+                            List.map (updateEditedDescription id newDescription) model.allTasks
+                    in
+                    { model | allTasks = updatedTasks }
+
                 Nothing ->
                     model
+
+        ResetId ->
+            { model
+                | editingTaskId = Nothing
+            }
 
 
 updateEditedDescription : Int -> String -> Task -> Task
 updateEditedDescription id newDescription task =
     if task.id == id then
-        { task | description = newDescription } -- Update description
-        
-    else 
-        task
-        -- EditTask id ->
-        --     let
-        --         updatedTasks =
-        --             List.map (editTask id model) model.allTasks
-        --     in
-        --     { model | allTasks = updatedTasks }
-
-
-editTask : Int -> Model -> Task -> Task
-editTask id model task =
-    if task.id == id then
-        task
+        { task | description = newDescription }
 
     else
         task
@@ -246,8 +230,3 @@ updateTaskStatus id task =
 
     else
         task
-
-
-
---          RemoveStudent studentId ->
--- { model | students = List.filter (\student -> student.id /= studentId) model.students }
