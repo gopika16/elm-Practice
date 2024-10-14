@@ -8,6 +8,8 @@ type alias Model =
     , newTask : Maybe String
     , editingTaskId : Maybe Int
     , lastId : Int
+    , warning :Maybe String
+    , filterTask : Bool
     }
 
 
@@ -30,4 +32,6 @@ initialModel =
     , newTask = Nothing
     , editingTaskId = Nothing
     , lastId = 3
+    , warning = Nothing
+    , filterTask = False
     }

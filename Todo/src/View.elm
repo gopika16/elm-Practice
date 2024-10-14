@@ -1,9 +1,10 @@
 module View exposing (view)
 
 import Entities exposing (Task)
-import Html exposing (Html, button, div, h1, input, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (checked, style, type_, value)
+import Html exposing (Html, button, div, h1, img, input, p, table, tbody, td, text, th, thead, tr)
+import Html.Attributes exposing (checked, src, style, type_, value)
 import Html.Events exposing (onClick, onInput, onMouseLeave)
+import Maybe exposing (withDefault)
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 
@@ -11,24 +12,32 @@ import Msg exposing (Msg(..))
 view : Model -> Html Msg
 view model =
     div
-        [ style "margin" "50%"
+        [ style "margin" "40%"
         , style "margin-top" "10%"
-        , onMouseLeave ResetId
+        , style "color" "white"
+        , onMouseLeave Reset
         ]
         [ h1 [] [ text "Todo Tasks" ]
+        , p [ style "color" "red" ] [ text (withDefault "" model.warning) ]
         , input
             [ onInput NewTask
             , style "width" "150px"
+            , style "height" "15px"
             , value (Maybe.withDefault "" model.newTask)
             ]
             []
         , button
             [ onClick AddTask
-            , style "font-size" "20px"
-            , style "padding" "10px"
-            , style "width" "150px"
+            , style "font-size" "15px"
+            , style "background-color" "white"
             ]
             [ text "Add Task" ]
+        , button
+            [ onClick FilterTask
+            , style "font-size" "15px"
+            , style "background-color" "white"
+            ]
+            [ text "Show Completed" ]
         , table
             [ style "letter-spacing" "1px"
             , style "border" "2px solid black"
@@ -39,19 +48,30 @@ view model =
                 [ tr []
                     [ th [] [ text "Status" ]
                     , th [] [ text "Description" ]
-                    , th [] [ text "Delete" ]
                     ]
                 ]
             , tbody []
-                (List.map (getTableRow model.editingTaskId) model.allTasks)
+                (List.map (getFilteredRows model.filterTask model.editingTaskId) model.allTasks)
             ]
         ]
+
+
+getFilteredRows : Bool -> Maybe Int -> Task -> Html Msg
+getFilteredRows isComplete editingTaskId task =
+    if isComplete then
+        if task.isComplete then
+            getTableRow editingTaskId task
+
+        else
+            text ""
+    else
+        getTableRow editingTaskId task
 
 
 getTableRow : Maybe Int -> Task -> Html Msg
 getTableRow editingTaskId data =
     tr
-        []
+        [ style "background-color" "black" ]
         [ td [ style "padding" "5px" ]
             [ input
                 [ type_ "checkbox"
@@ -69,7 +89,6 @@ getTableRow editingTaskId data =
                  else
                     "none"
                 )
-            , onClick (EditTask data.id)
             ]
             [ if Just data.id == editingTaskId then
                 input
@@ -84,9 +103,30 @@ getTableRow editingTaskId data =
             ]
         , td [ style "padding" "5px" ]
             [ button
-                [ onClick (DeleteTask data.id)
-                , style "background-color" "red"
+                [ onClick (EditTask data.id)
+                , style "border" "none"
+                , style "cursor" "pointer"
                 ]
-                [ text "Delete" ]
+                [ img
+                    [ src "https://banner2.cleanpng.com/20190518/ost/kisspng-computer-icons-scalable-vector-graphics-editing-cl-edit-svg-png-icon-free-download-252434-online-1713892319098.webp"
+                    , style "width" "20px"
+                    , style "height" "20px"
+                    ]
+                    []
+                ]
+            ]
+        , td [ style "padding" "5px" ]
+            [ button
+                [ onClick (DeleteTask data.id)
+                , style "border" "none"
+                , style "cursor" "pointer"
+                ]
+                [ img
+                    [ src "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZ-C7xd5t5WaAiTd43G1xmKb9vYK2uDmaqvg&s"
+                    , style "width" "20px"
+                    , style "height" "20px"
+                    ]
+                    []
+                ]
             ]
         ]

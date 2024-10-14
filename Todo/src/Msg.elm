@@ -8,4 +8,5 @@ type Msg
     | DeleteTask Int
     | EditTask Int
     | SaveEditedTask String
-    | ResetId
+    | Reset
+    | FilterTask

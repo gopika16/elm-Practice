@@ -58,15 +58,26 @@ update msg model =
                         updatedTasks =
                             List.map (updateTaskDescription id newDescription) model.allTasks
                     in
-                    { model | allTasks = updatedTasks }
+                    if newDescription /= "" then
+                        { model
+                            | allTasks = updatedTasks
+                            , warning = Nothing
+                        }
+
+                    else
+                        { model | warning = Just "Task Cannot be empty" }
 
                 Nothing ->
                     model
 
-        ResetId ->
+        Reset ->
             { model
                 | editingTaskId = Nothing
+                , warning = Nothing
             }
+
+        FilterTask ->
+            { model | filterTask = not model.filterTask }
 
 
 updateTaskDescription : Int -> String -> Task -> Task
