@@ -2,13 +2,13 @@ module Model exposing (..)
 
 
 type alias Model =
-    { value : Int
+    { totalFruits : Int
     , days : List Int
     }
 
 
 initialModel : Model
 initialModel =
-    { value = 0
+    { totalFruits = 0
     , days = []
     }

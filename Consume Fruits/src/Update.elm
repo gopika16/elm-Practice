@@ -7,13 +7,13 @@ import Msg exposing (Msg(..))
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        SetValue value ->
+        SetTotalFruits value ->
             { model
-                | value = Maybe.withDefault 0 (String.toInt value)
+                | totalFruits = Maybe.withDefault 0 (String.toInt value)
                 , days = []
             }
 
-        CalculateFruits ->
+        DistributeFruits ->
             calculateFruits model
 
 
@@ -21,18 +21,16 @@ calculateFruits : Model -> Model
 calculateFruits model =
     let
         splitFruits =
-            model.value // 7
-
-        remainingFruits =
-            modBy 7 model.value
-
-        list =
+            model.totalFruits // 7
+        
+        distributedFruits =
             List.repeat 7 splitFruits
 
-        newList =
-            List.indexedMap (distribute remainingFruits) list
+        remainingFruits =
+            modBy 7 model.totalFruits
+
     in
-    { model | days = newList }
+    { model | days = List.indexedMap (distribute remainingFruits) distributedFruits }
 
 
 distribute : comparable -> comparable -> number -> number

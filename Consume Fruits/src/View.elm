@@ -1,11 +1,10 @@
 module View exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (style, value)
 import Html.Events exposing (onClick, onInput)
 import Model exposing (Model)
 import Msg exposing (Msg(..))
-import Html.Attributes exposing (value)
 
 
 view : Model -> Html Msg
@@ -14,10 +13,10 @@ view model =
         [ style "margin" "20%"
         ]
         [ text "Add number : "
-        , input [ onInput SetValue , value (String.fromInt model.value)] []
-        , button [ onClick CalculateFruits ] [ text "Calculate" ]
+        , input [ onInput SetTotalFruits, value (String.fromInt model.totalFruits) ] []
+        , button [ onClick DistributeFruits ] [ text "Calculate" ]
         , div []
-            [ if model.value > 0 then
+            [ if model.totalFruits > 0 then
                 ul []
                     (List.map showFruitDays model.days)
 

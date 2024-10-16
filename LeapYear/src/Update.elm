@@ -7,15 +7,15 @@ import Msg exposing (Msg(..))
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        UpdateFirstValue value ->
+        UpdateStartYear value ->
             { model
-                | firstValue = Maybe.withDefault 0 (String.toInt value)
+                | startYear = Maybe.withDefault 0 (String.toInt value)
                 , leapYears = []
             }
 
-        UpdateSecondValue value ->
+        UpdateEndYear value ->
             { model
-                | secondValue = Maybe.withDefault 0 (String.toInt value)
+                | endYear = Maybe.withDefault 0 (String.toInt value)
                 , leapYears = []
             }
 
@@ -25,19 +25,19 @@ update msg model =
 
 calculateLeapYear : Model -> Model
 calculateLeapYear model =
-    if model.firstValue > 0 && model.secondValue > 0 then
-        if model.firstValue > model.secondValue then
+    if model.startYear > 0 && model.endYear > 0 then
+        if model.startYear > model.endYear then
             let
                 firstValue =
-                    model.secondValue + 1
+                    model.endYear + 1
 
                 secondValue =
-                    model.firstValue
+                    model.startYear
             in
             { model | leapYears = getLeapYear firstValue secondValue model.leapYears }
 
         else
-            { model | leapYears = getLeapYear (model.firstValue + 1) model.secondValue model.leapYears }
+            { model | leapYears = getLeapYear (model.startYear + 1) model.endYear model.leapYears }
 
     else
         model

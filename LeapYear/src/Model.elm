@@ -2,15 +2,15 @@ module Model exposing (..)
 
 
 type alias Model =
-    { firstValue : Int
-    , secondValue : Int
+    { startYear : Int
+    , endYear : Int
     , leapYears : List Int
     }
 
 
 initModel : Model
 initModel =
-    { firstValue = 0
-    , secondValue = 0
+    { startYear = 0
+    , endYear = 0
     , leapYears = []
     }

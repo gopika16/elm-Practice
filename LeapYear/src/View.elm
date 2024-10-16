@@ -11,13 +11,13 @@ view : Model -> Html Msg
 view model =
     div []
         [ input
-            [ onInput UpdateFirstValue
-            , value (String.fromInt model.firstValue)
+            [ onInput UpdateStartYear
+            , value (String.fromInt model.startYear)
             ]
             []
         , input
-            [ onInput UpdateSecondValue
-            , value (String.fromInt model.secondValue)
+            [ onInput UpdateEndYear
+            , value (String.fromInt model.endYear)
             ]
             []
         , button [ onClick GetLeapYears ] [ text "check" ]

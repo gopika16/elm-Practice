@@ -2,6 +2,6 @@ module Msg exposing (..)
 
 
 type Msg
-    = UpdateFirstValue String
-    | UpdateSecondValue String
+    = UpdateStartYear String
+    | UpdateEndYear String
     | GetLeapYears

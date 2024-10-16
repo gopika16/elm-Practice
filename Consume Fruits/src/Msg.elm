@@ -1,4 +1,4 @@
 module Msg exposing (..)
 
 type Msg
-    = CalculateFruits | SetValue String
+    = DistributeFruits | SetTotalFruits String
